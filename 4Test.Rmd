@@ -1,0 +1,72 @@
+---
+title: "4Test"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+#install.packages("gridExtra")
+library(gridExtra)
+```
+
+#1.1
+```{r}
+happy <- read.csv("../Data/Happiness.csv")
+head(happy)
+```
+
+#2.1
+```{r}
+Region_freq <- happy%>% group_by(Region)%>%summarise(freq=n())%>%arrange(-freq)
+Region_freq
+```
+
+#2.1.1
+```{r}
+ggplot(happy%>%group_by(Region)%>%summarise(n=n()),aes(reorder(Region,n),n,fill=Region))+geom_bar(stat="identity")+labs(x="Region",y="count")+theme(axis.text.x = element_blank())
+```
+
+#2.1.2
+```{r}
+p1 <- ggplot(happy,aes(Region,H_Score,fill=Region,col=Region)) + geom_point()+theme(axis.text.x = element_blank())
+
+p2 <- ggplot(happy,aes(Region,H_Score,fill=Region)) + geom_boxplot()+theme(axis.text.x = element_blank())
+
+
+grid.arrange(p1,p2)
+
+```
+
+
+#2.2
+```{r}
+East_Asia <- happy%>%filter(Region=='Eastern Asia' & H_Score >=5.0 & year==2017)%>%arrange(desc(H_Score))
+head(East_Asia,3)
+```
+
+#2.3
+```{r}
+
+###################################################################################################
+#Mongolia 나라의 경우 Eastern Asia 지역이지만 2017년 기준 행복지수가 0.4955로서 0.5가 넘지 않습니다.
+#따라서 문제를 기준으로 코드를 짜면 아래와 같은 결과가 나옵니다.
+
+
+FamScore_Easia <- East_Asia %>%mutate(family_prob= Family/H_Score) %>%select(Country, family_prob)
+FamScore_Easia
+```
+
+#2.3
+```{r}
+
+#############################################################################################
+#문제를 기준으로 작성한 것이 아니라 결과창을 기준으로 코드를 짜면 아래와 같은 결과가 나옵니다.
+
+
+
+
+FamScore_Easia2 <- happy%>%filter(Region=='Eastern Asia' & H_Score >=4.9 & year==2017)%>%mutate(family_prob=Family/H_Score)%>%arrange(desc(family_prob))%>%select(Country,family_prob)
+FamScore_Easia2
+
+```
